@@ -71,13 +71,10 @@ int main(int argc, char** argv) {
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
 
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
 	// Create and compile our GLSL program from the shaders
     Shader defaultShader("passthru.vert", "passthru.frag");
     Shader normalShader("normals.vert", "normals.geom", "normals.frag");
+    Shader lampShader("phong.vert", "phong.frag");
 
 	// Load the texture
 	GLuint Texture = loadBMP_custom("mandrill.bmp");
@@ -103,46 +100,35 @@ int main(int argc, char** argv) {
     // Print some Info;
 	PrintInfo(objLoader, vpack);
 
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+
 	// Load it into a VBO
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	/* GLuint vertexbuffer; */
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vpack.size() * sizeof(GLfloat), &vpack[0], GL_STATIC_DRAW);
 
-
+	glBindVertexArray(VAO);
 
 	//0 rst attribute buffer : vertices
-	glVertexAttribPointer(
-		0,                  // attribute
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		istrides,                  // stride
-		(void*)0            // array buffer offset
-	);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, istrides, (void*)0);
 	glEnableVertexAttribArray(0);
-
 	// 1st attribute buffer : UVs
-	glVertexAttribPointer(
-		1,                                // attribute
-		2,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		istrides,                      // stride
-		(void*)(3 * sizeof(GLfloat))   // array buffer offset
-	);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, istrides, (void*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
-
 	// 2nd attribute buffer : normal
-	glVertexAttribPointer(
-		2,                  // attribute
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		istrides,                  // stride
-		(void*)(5 * sizeof(GLfloat))  // array buffer offset
-	);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, istrides, (void*)(5 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
+
+    unsigned int lampVAO;
+    glGenVertexArrays (1, &lampVAO);
+    glBindVertexArray (lampVAO);
+    
+    glBindBuffer (GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, istrides, (void*)0);
+    glEnableVertexAttribArray(3);
 
     // create transformations
     glm::mat4 model;
@@ -152,14 +138,20 @@ int main(int argc, char** argv) {
     glm::mat4 view;
 
     GLuint programID_default;
-    GLuint programID_normal;
     GLuint MatrixID_default; 
+    GLuint programID_normal;
     GLuint MatrixID_normal; 
+    GLuint programID_lamp;
+    GLuint MatrixID_lamp; 
 
     float tc[]={
         0.0f, 0.0f, 0.0f
     };
-
+    
+    // lighting
+    glm::vec3 lampPos(1.2f, 0.0f, 2.0f);
+    glm::vec3 lampColor(1.0f, 1.0f, 1.0f);
+    glm::vec3 viewPos(1.0f, 0.0f, 1.5f);
 
 	do{
 		// Clear the screen
@@ -178,7 +170,7 @@ int main(int argc, char** argv) {
         model=t3*(t2*m*t1);
         // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -8.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 100.0f);
 		MVP = projection * view * model;
 
@@ -186,13 +178,19 @@ int main(int argc, char** argv) {
         defaultShader.use();
 	    // Get a handle for our "MVP" uniform
         programID_default = defaultShader.getID();
-	    MatrixID_default = glGetUniformLocation(programID_default, "MVP");
-		// Send our transformation to the currently bound shader, 
-		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID_default, 1, GL_FALSE, &MVP[0][0]);
+	    /* MatrixID_default = glGetUniformLocation(programID_default, "MVP"); */
+		// Send our transformation to the currently bound shader, // in the "MVP" uniform
+		/* glUniformMatrix4fv(MatrixID_default, 1, GL_FALSE, &MVP[0][0]); */
+		glUniformMatrix4fv(glGetUniformLocation(programID_default, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programID_default, "model"), 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programID_default, "view"), 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programID_default, "projection"), 1, GL_FALSE, &projection[0][0]);
+		glUniform3fv(glGetUniformLocation(programID_default, "lampPos"), 1, &lampPos[0]);
+		glUniform3fv(glGetUniformLocation(programID_default, "lampColor"), 1, &lampColor[0]);
+		glUniform3fv(glGetUniformLocation(programID_default, "viewPos"), 1, &viewPos[0]);
+        glBindVertexArray(VAO);
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, vpack.size() / 8 );
-
 
 		// Use our shader
         normalShader.use();
@@ -202,7 +200,20 @@ int main(int argc, char** argv) {
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID_normal, 1, GL_FALSE, &MVP[0][0]);
+        glBindVertexArray(VAO);
 		// Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, vpack.size()/8);
+
+        //draw the lamp object
+        lampShader.use();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lampPos);
+        model = glm::scale(model, glm::vec3(0.3f));
+		MVP = projection * view * model;
+        programID_lamp = lampShader.getID();
+	    MatrixID_lamp = glGetUniformLocation(programID_lamp, "MVP");
+		glUniformMatrix4fv(MatrixID_normal, 1, GL_FALSE, &MVP[0][0]);
+        glBindVertexArray(lampVAO);
 		glDrawArrays(GL_TRIANGLES, 0, vpack.size()/8);
 
 		// Swap buffers
@@ -218,7 +229,7 @@ int main(int argc, char** argv) {
 	glDisableVertexAttribArray(2);
 		
 	// Cleanup VBO and shader
-	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &VBO);
 	glDeleteProgram(programID_default);
 	glDeleteProgram(programID_normal);
 	glDeleteTextures(1, &Texture);

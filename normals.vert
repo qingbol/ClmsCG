@@ -1,7 +1,7 @@
 #version 330 core
 
-layout (location = 0) in vec3 position; //position as attribure
-layout (location = 2) in vec3 normal; //normal as attribute
+layout (location = 4) in vec3 position; //position as attribure
+layout (location = 5) in vec3 normal; //normal as attribute
 
 out vec4 vert_normal;
 out vec4 vert_color;

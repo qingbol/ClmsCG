@@ -33,6 +33,7 @@ class ObjLoader{
   }
 
   void Pack(std::vector<GLfloat>& vpack);
+  void FaceNormalPack(std::vector<GLfloat>& vpack);
   void CalcNormals();
 
   //friends

@@ -187,6 +187,30 @@ void ObjLoader::Pack(std::vector<GLfloat>& vpack) {
   }
 }
 
+//store face normal to vpack, used for phong lighting model
+void ObjLoader::FaceNormalPack(std::vector<GLfloat>& vpack) {
+  for(int i=0; i < (size_t)v_indices_.size(); i++) {
+    vpack.push_back(v_coords_[v_indices_[i]].x);
+    vpack.push_back(v_coords_[v_indices_[i]].y);
+    vpack.push_back(v_coords_[v_indices_[i]].z);
+
+    if (!vt_indices_.empty()) {
+      vpack.push_back(vt_coords_[vt_indices_[i]].x);
+      vpack.push_back(vt_coords_[vt_indices_[i]].y);
+    }
+
+    //note: we expect in the end as many vertex normals as vertices
+    //we need to index into vn list using the current vertex index
+    int fn_index = i/3;
+    /* std::cerr << "fn_index is " << fn_index << std::endl; */
+    if(!vn_indices_.empty()) {
+      vpack.push_back(face_normals_[fn_index].x);
+      vpack.push_back(face_normals_[fn_index].y);
+      vpack.push_back(face_normals_[fn_index].z);
+    }
+  }
+}
+
 void ObjLoader::CalcNormals(){
   glm::vec3 p0, p1, p2, v1, v2;
   glm::vec3 fn;

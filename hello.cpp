@@ -85,6 +85,9 @@ int main(int argc, char** argv) {
     std::vector<GLfloat> vpack;
     objLoader.Pack(vpack);
 
+    std::vector<GLfloat> fn_vpack;
+    objLoader.FaceNormalPack(fn_vpack);
+
     //compute the stride
     int istride = 3;
     if (!objLoader.vt_indices_.empty()) {
@@ -98,7 +101,8 @@ int main(int argc, char** argv) {
     int istrides = istride * sizeof(GLfloat);
 
     // Print some Info;
-	PrintInfo(objLoader, vpack);
+	/* PrintInfo(objLoader, vpack); */
+	PrintInfo(objLoader, fn_vpack);
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -108,10 +112,16 @@ int main(int argc, char** argv) {
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	/* glBufferData(GL_ARRAY_BUFFER, vpack.size() * sizeof(GLfloat), &vpack[0], GL_STATIC_DRAW); */
+	glBufferData(GL_ARRAY_BUFFER, fn_vpack.size() * sizeof(GLfloat), &fn_vpack[0], GL_STATIC_DRAW);
+    
+	GLuint vnVBO;
+	glGenBuffers(1, &vnVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, vnVBO);
 	glBufferData(GL_ARRAY_BUFFER, vpack.size() * sizeof(GLfloat), &vpack[0], GL_STATIC_DRAW);
-
+    
 	glBindVertexArray(VAO);
-
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//0 rst attribute buffer : vertices
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, istrides, (void*)0);
 	glEnableVertexAttribArray(0);
@@ -121,11 +131,17 @@ int main(int argc, char** argv) {
 	// 2nd attribute buffer : normal
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, istrides, (void*)(5 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
+    
+	glBindBuffer(GL_ARRAY_BUFFER, vnVBO);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, istrides, (void*)0);
+	glEnableVertexAttribArray(4);
+	// 2nd attribute buffer : normal
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, istrides, (void*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(5);
 
     unsigned int lampVAO;
     glGenVertexArrays (1, &lampVAO);
     glBindVertexArray (lampVAO);
-    
     glBindBuffer (GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, istrides, (void*)0);
     glEnableVertexAttribArray(3);
@@ -149,7 +165,7 @@ int main(int argc, char** argv) {
     };
     
     // lighting
-    glm::vec3 lampPos(1.2f, 0.0f, 2.0f);
+    glm::vec3 lampPos(2.0f, 0.5f, 0.3f);
     glm::vec3 lampColor(1.0f, 1.0f, 1.0f);
     glm::vec3 viewPos(1.0f, 0.0f, 1.5f);
 
@@ -170,7 +186,7 @@ int main(int argc, char** argv) {
         model=t3*(t2*m*t1);
         // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -8.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -6.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 100.0f);
 		MVP = projection * view * model;
 

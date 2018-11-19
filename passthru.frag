@@ -23,20 +23,20 @@ void main(){
     vec3 objectColor = texture( myTexture, UV ).rgb;
     
     // ambient
-    float ambientStrength = 0.2;
+    float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lampColor;
 
     // diffuse
     vec3 norm = normalize(anormal);
     vec3 lightDir = normalize(lampPos - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lampColor;
+    vec3 diffuse = 0.4 * diff * lampColor;
 
     // specular
     float specularStrength = 2;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 2);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = specularStrength * spec * lampColor;
 
     vec3 result = (ambient + diffuse + specular) * objectColor;

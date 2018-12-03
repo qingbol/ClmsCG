@@ -1,0 +1,56 @@
+1 Course no: CpSc6050-001 
+
+2 Name:Qingbo Lai
+
+3 Brief solution description:
+	  *First, Read the pyramid.obj file into an array vpack.
+	  *Secondly, use 2-pass render method. render the object with shader objects [passthru.vert, passthru.frag], and then render the normals with [normals.vert, normals.geom, normals.frag]
+4 Lessons learned:
+	【1】 avoiding some typo in shader file，There's no hint when compile, but some error infomation appear when run ./hello .
+		tarus@ubuntu:/mnt/hgfs/10SrcFldr/CPSC6050CG/asg5/asg05_03$ ./hello
+		ERROR::SHADER::VERTEX::COMPILATION_FAILED
+		0:7(1): error: syntax error, unexpected OUT_TOK, expecting ',' or ';'
+		ERROR::SHADER::PROGRAM::LINkED_FAILED.
+		error: linking with uncompiled/unspecialized shader
+	========================
+
+	【2】putting this statment - glDeleteProgram(programID); - into the do-while loop, leading to can't display the normal。
+
+
+	【3】when defined outside the do-while loop, m & view must be initialized to 1.0f.
+	        glm::mat4 view;
+	        view = glm::mat4(1.0f);
+	        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+
+	        glm::mat4 m；
+	        m=glm::mat4(1.0f);
+	        m=glm::rotate(m,(float)glfwGetTime()*2,glm::vec3(0.5f, 1.0f, 0.0f));      
+
+	【4】Define a flag_fn variable in CalcNormalsin function of obj_loader.cpp file to avoid adding the same normal twice . By check the dot product value to achieve this purpose.
+	    //use flag_fn to identify if this vector already exist.
+        int flag_fn = 1;
+        for (int g = 0; g < f; g++) {
+          float dot_result = face_normals_[face_indices_[v][f]].x * face_normals_[face_indices_[v][g]].x \
+                             + face_normals_[face_indices_[v][f]].y * face_normals_[face_indices_[v][g]].y \
+                             + face_normals_[face_indices_[v][f]].z * face_normals_[face_indices_[v][g]].z; 
+          float modulus_vf = face_normals_[face_indices_[v][f]].x * face_normals_[face_indices_[v][f]].x \
+                             + face_normals_[face_indices_[v][f]].y * face_normals_[face_indices_[v][f]].y \
+                             + face_normals_[face_indices_[v][f]].z * face_normals_[face_indices_[v][f]].z;
+          float modulus_vg = face_normals_[face_indices_[v][g]].x * face_normals_[face_indices_[v][g]].x \
+                             + face_normals_[face_indices_[v][g]].y * face_normals_[face_indices_[v][g]].y \
+                             + face_normals_[face_indices_[v][g]].z * face_normals_[face_indices_[v][g]].z;
+          float modulus_fg = sqrt(modulus_vf * modulus_vg);
+          if (dot_result == modulus_fg) {
+            flag_fn = 0;
+            break;
+          }
+
+
+5 Special usage instructions:
+  *Platform: ubuntu16.04
+	  $make
+	  $./hello
+  *using esc key to close the window.
+
+
+  

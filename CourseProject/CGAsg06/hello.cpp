@@ -20,9 +20,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.h"
-#include "texture.h"
-#include "obj_loader.h"
+#include "includes/shader.h"
+#include "includes/texture.h"
+#include "includes/obj_loader.h"
 
 // settings
 const unsigned int SCR_WIDTH = 1024;

@@ -30,7 +30,7 @@ void main(){
     vec3 norm = normalize(anormal);
     vec3 lightDir = normalize(lampPos - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = 0.4 * diff * lampColor;
+    vec3 diffuse = 0.6 * diff * lampColor;
 
     // specular
     float specularStrength = 2;

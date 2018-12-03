@@ -13,7 +13,7 @@
 #include <GL/glext.h>
 #endif
 
-#include "shader.h"
+#include "includes/shader.h"
 
 Shader::Shader(const char* vpath, const char* fpath) {
   GLint compiled, linked;

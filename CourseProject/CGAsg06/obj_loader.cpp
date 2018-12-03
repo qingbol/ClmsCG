@@ -19,7 +19,7 @@
 #include <glm/glm.hpp> //GLM core
 #include <glm/gtx/string_cast.hpp>
 
-#include "obj_loader.h"
+#include "includes/obj_loader.h"
 
 ///////////////////  friends //////////////////////////////
 std::istream& operator>>(std::istream& s, ObjLoader& rhs){

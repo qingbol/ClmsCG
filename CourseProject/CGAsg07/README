@@ -3,12 +3,34 @@
 2 Name:Qingbo Lai
 
 3 Brief solution description:
-	  *First, Read the pyramid.obj file into an array vpack.
-	  *Secondly, use 2-pass render method. render the object with shader objects [passthru.vert, passthru.frag], and then render the normals with [normals.vert, normals.geom, normals.frag]
+	* use the mouse and the keyboard to move the camera
+	* reads the keyboard and mouse and computes the Projection and View matrices
+	* use Euler angle to compute any camera rotation.
 4 Lessons learned:
-	【1】Use face normal instead of vertex normal to calculate the diffusion lighting and specular lighting.d.
-         So I create a new function in obj_loader.cpp to implement this.
-         void ObjLoader::FaceNormalPack(std::vector<GLfloat>& vpack) ;
+	【1】When set the key control, make sure the camera move along axis in view space instead of world space.
+	【2】Don't set the Front value to glm::vec3(0.0f, 0.0f, 0.0f), or Position += Front * velocity won't change anymore.
+	【3】Use glfwSetCursorPosCallback() to get the positon of mouse, but the position value keep increasing, I think this is wrong but  I can't find a solution now.
+        The output ofmouse positon:
+			xoffset is 120.471 yoffset is  -196.477
+			xpo is 8212.05 ypos is  5654.78
+			xoffset is 102.475 yoffset is  -114.487
+			xpo is 8306.53 ypos is  5702.26
+			xoffset is 94.4768 yoffset is  -47.4837
+			xpo is 8395.01 ypos is  5634.75
+			xoffset is 88.4788 yoffset is  67.5096
+			xpo is 8395.01 ypos is  5500.24
+			xoffset is 0.000244141 yoffset is  134.513
+			xpo is 8395.01 ypos is  5432.73
+			xoffset is 0.000244141 yoffset is  67.5096
+			xpo is 8156.49 ypos is  5511.21
+			xoffset is -238.518 yoffset is  -78.4806
 
-	【2】Ajust the specularStrength & lamp position to get a more realistic effects. 
+5 instruction:
+	* W : move along the -Z axis in view space
+	* S : move along the +Z axis in view space
+	* A : move along the -X axis in view space
+	* D : move along the +X axis in view space
+	* R : reset the camera position and target point
+	* move the mouse to look around, actually the mouse position variation is fed to Euler angle.
+	* use mouse scroll-wheel to zoom in or zomm out.
 

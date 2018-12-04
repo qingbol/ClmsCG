@@ -1,0 +1,14 @@
+1 Course no: CpSc6050-001 
+
+2 Name:Qingbo Lai
+
+3 Brief solution description:
+	  *First, Read the pyramid.obj file into an array vpack.
+	  *Secondly, use 2-pass render method. render the object with shader objects [passthru.vert, passthru.frag], and then render the normals with [normals.vert, normals.geom, normals.frag]
+4 Lessons learned:
+	【1】Use face normal instead of vertex normal to calculate the diffusion lighting and specular lighting.d.
+         So I create a new function in obj_loader.cpp to implement this.
+         void ObjLoader::FaceNormalPack(std::vector<GLfloat>& vpack) ;
+
+	【2】Ajust the specularStrength & lamp position to get a more realistic effects. 
+

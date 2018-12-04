@@ -1,13 +1,23 @@
-#include <glad/glad.h>
+//test the git repo
+// Include GLEW
+#ifdef __APPLE__
+#include<OpenGL/gl3.h>
+#include<OpenGL/gl3ext.h>
+#else
+// #include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
+#endif
+//#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <learnopengl/filesystem.h>
-#include <learnopengl/shader_m.h>
-#include <learnopengl/camera.h>
+#include "learnopengl/filesystem.h"
+#include "learnopengl/shader.h"
+#include "learnopengl/camera.h"
 
 #include <iostream>
 
@@ -65,11 +75,11 @@ int main()
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+    /* if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) */
+    /* { */
+    /*     std::cout << "Failed to initialize GLAD" << std::endl; */
+    /*     return -1; */
+    /* } */
 
     // configure global opengl state
     // -----------------------------
